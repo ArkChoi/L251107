@@ -33,6 +33,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void Rotation_Roll(float AxisValue);
+
+	void Rotation_Pitch(float AxisValue);
+
+	void RoketFire();
+
 public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	UBoxComponent* Box;

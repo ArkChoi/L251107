@@ -9,6 +9,10 @@
 #include "Components/ArrowComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 
+#include "Kismet/GameplayStatics.h"
+
+#include "Roket.h"
+
 // Sets default values
 AMyPawn::AMyPawn()
 {
@@ -85,6 +89,24 @@ void AMyPawn::Tick(float DeltaTime)
 void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	InputComponent->BindAxis("Roll",this, &AMyPawn::Rotation_Roll);
+	InputComponent->BindAxis("Pitch", this, &AMyPawn::Rotation_Pitch);
 
+	InputComponent->BindAction("Fire", IE_Pressed, this, &AMyPawn::RoketFire);
 }
 
+void AMyPawn::Rotation_Roll(float AxisValue)
+{
+	this->AddActorLocalRotation(FRotator(0,0, AxisValue * UGameplayStatics::GetWorldDeltaSeconds(GetWorld())));
+}	
+
+void AMyPawn::Rotation_Pitch(float AxisValue)
+{
+	this->AddActorLocalRotation(FRotator(AxisValue * UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), 0, 0));
+}
+
+void AMyPawn::RoketFire()
+{
+	//this->GetWorld()->SpawnActorDeferred(ARoket::StaticClass,,);
+	UE_LOG(LogTemp, Warning, TEXT("Fire"));
+}

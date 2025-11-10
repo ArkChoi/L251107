@@ -19,6 +19,7 @@ ARoket::ARoket()
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(Box);
+	StaticMesh->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 0.0f), FQuat(FRotator(-90.0f, 0.0f, 0.0f)));
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->InitialSpeed = 200.f;
@@ -37,6 +38,5 @@ void ARoket::BeginPlay()
 void ARoket::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
