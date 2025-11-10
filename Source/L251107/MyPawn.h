@@ -12,6 +12,7 @@ class UCameraComponent;
 class UFloatingPawnMovement;
 class USpringArmComponent;
 class UArrowComponent;
+struct FInputActionValue;
 
 UCLASS()
 class L251107_API AMyPawn : public APawn
@@ -39,6 +40,10 @@ public:
 
 	void RoketFire();
 
+	void EnhancedFire(const FInputActionValue& Value);
+
+	void UICMove(const FInputActionValue& Value);
+
 public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	UBoxComponent* Box;
@@ -61,4 +66,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	UArrowComponent* Arrow;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<class UInputAction> IA_Move;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<class UInputAction> IA_Fire;
 };

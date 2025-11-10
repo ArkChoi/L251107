@@ -8,6 +8,9 @@
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "EnhancedInputComponent.h"
+#include "InputAction.h"
+#include "InputActionValue.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -64,6 +67,18 @@ AMyPawn::AMyPawn()
 
 	Movement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MoveMent"));
 	Movement->MaxSpeed = 100.f;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_FireAsset(TEXT("/Script/EnhancedInput.InputAction'/Game/P_38Game/Input/IA_Fire.IA_Fire'"));
+	if (IA_FireAsset.Succeeded())
+	{
+		IA_Fire = IA_FireAsset.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_MovementAsset(TEXT("/Script/EnhancedInput.InputAction'/Game/P_38Game/Input/IA_Move.IA_Move'"));
+	if (IA_MovementAsset.Succeeded())
+	{
+		IA_Move = IA_MovementAsset.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -89,10 +104,19 @@ void AMyPawn::Tick(float DeltaTime)
 void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("Roll",this, &AMyPawn::Rotation_Roll);
+
+	UEnhancedInputComponent* UIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (UIC)
+	{
+		UIC->BindAction(IA_Fire, ETriggerEvent::Triggered, this, &AMyPawn::EnhancedFire);
+		UIC->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AMyPawn::UICMove);
+		UE_LOG(LogTemp, Warning, TEXT("Hello World"));
+	}
+
+	/*PlayerInputComponent->BindAxis("Roll",this, &AMyPawn::Rotation_Roll);
 	PlayerInputComponent->BindAxis("Pitch", this, &AMyPawn::Rotation_Pitch);
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyPawn::RoketFire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyPawn::RoketFire);*/
 
 }
 
@@ -115,4 +139,25 @@ void AMyPawn::Rotation_Pitch(float AxisValue)
 void AMyPawn::RoketFire()
 {
 	this->GetWorld()->SpawnActor<ARoket>(ARoket::StaticClass(),Arrow->K2_GetComponentToWorld());
+}
+
+//
+void AMyPawn::EnhancedFire(const FInputActionValue& Value)
+{
+	AMyPawn::RoketFire();
+	UE_LOG(LogTemp, Warning, TEXT("Fire"));
+}
+
+void AMyPawn::UICMove(const FInputActionValue& Value)
+{
+	FVector2D WantedRotation = Value.Get<FVector2D>();
+	WantedRotation = WantedRotation * 60.0f * UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
+	AddActorLocalRotation(
+		FRotator(
+			WantedRotation.Y,
+			0,
+			WantedRotation.X
+		)
+	);
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *WantedRotation.ToString());
 }
